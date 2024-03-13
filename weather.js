@@ -2,7 +2,7 @@
 
 import { getArgs } from './helpers/args.js' ;
 import { getWeather } from './services/api.service.js';
-import { printHelp, printSuccess, printError } from './services/log.service.js';
+import { printHelp, printSuccess, printError, printWeather } from './services/log.service.js';
 import { saveKeyValue } from './services/storage.service.js';
 
 
@@ -19,10 +19,23 @@ const saveToken = async (token) => {
   }
 }
 
+const saveCity = async (city) => {
+  if (!city.length) {
+    printError('city not saved');
+    return;
+  }
+  try {
+    await saveKeyValue('city', city)
+    printSuccess('city saved')
+  } catch (e) {
+    printError(e.message)
+  }
+}
+
 const getForcast = async () => {
   try {
-    const weather = await getWeather('ufa');
-    console.log(weather);
+    const weather = await getWeather();
+    printWeather(weather);
   } catch (e) {
     if(e?.response?.status == 404) {
       printError('the city is incorrect')
@@ -40,11 +53,10 @@ const initCLI = () => {
     printHelp()
   }
   if(args.s) {
-    //save city
+    return saveCity(args.s)
   }
   if(args.t) {
     return saveToken(args.t);
-    // token
   }
   getForcast()
 }

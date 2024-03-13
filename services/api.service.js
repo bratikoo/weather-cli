@@ -19,10 +19,11 @@ const getGeoByCity = async (city) => {
 }
 
 
-const getWeather = async (city) => {
+const getWeather = async () => {
   if (!token) {
     throw new Error('api key is not set, set it using the -t [API_KEY] command.')
   }
+  const city = process.env.CITY ?? await getKeyValue('city');
   const { coord } = await getGeoByCity(city);
   const { data } = await axios.get(BASE_URL, {
     params: {
